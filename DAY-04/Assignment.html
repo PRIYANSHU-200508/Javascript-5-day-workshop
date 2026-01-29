@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+
+  <h2>Ask a Question</h2>
+
+  <input type="text" id="question" placeholder="Type your question">
+  <button onclick="askAI()">Ask</button>
+
+  <h3>Question:</h3>
+  <p id="q"></p>
+
+  <h3>Answer:</h3>
+  <p id="a"></p>
+<script>
+  async function askAI() {
+    let query = document.getElementById("question").value
+    document.getElementById("q").innerText = query
+    document.getElementById("a").innerText = "Loading..."
+
+    try {
+      let response = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=PASTE_REAL_API_KEY_HERE",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [{ text: query }]
+              }
+            ]
+          })
+        }
+      )
+
+      let data = await response.json()
+
+      if (!data.candidates) {
+        document.getElementById("a").innerText = "Invalid API key or request"
+        return
+      }
+
+      document.getElementById("a").innerText =
+        data.candidates[0].content.parts[0].text
+
+    } catch (err) {
+      document.getElementById("a").innerText = "Error fetching answer"
+      console.log(err)
+    }
+  }
+</script>
+
+
+</body>
+</html>
